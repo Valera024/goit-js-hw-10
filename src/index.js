@@ -12,6 +12,7 @@ const refs = {
 
 refs.breedSelect.style.width = "300px"
 refs.breedSelect.style.marginBottom = "20px"
+refs.breedSelect.style.display = "none"
 refs.error.style.display = "none"
 refs.loader.style.fontSize = "30px"
 refs.loader.style.fontWeight = "bold"
@@ -37,10 +38,10 @@ function initializePage() {
                     option.innerHTML = `${breed.name}`
                     refs.breedSelect.appendChild(option)
             }
+            refs.breedSelect.style.display = "flex"
             new SlimSelect({
                 select: refs.breedSelect,
             })
-
             refs.loader.style.display = "none";
         })
         .catch((error) => {
