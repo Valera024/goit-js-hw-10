@@ -23,17 +23,13 @@ let storedBreeds = [];
 
 window.addEventListener("load", initializePage)
 
-
 function initializePage() {  
     fetchBreeds()
-        .then((filteredBreeds) => {
-            storedBreeds = filteredBreeds
+        .then((response) => {
+            storedBreeds = response.data
             for (let i = 0; i < storedBreeds.length; i += 1) {
                 const breed = storedBreeds[i];
                     let option = document.createElement('option');
-
-                    if (!breed.image) continue
-                
                     option.value = i
                     option.innerHTML = `${breed.name}`
                     refs.breedSelect.appendChild(option)
@@ -54,19 +50,27 @@ function initializePage() {
 refs.breedSelect.addEventListener("change", () => {
     const selectBreedId = storedBreeds[refs.breedSelect.value].id;
     const feilterCat = storedBreeds.filter(breed => breed.id === selectBreedId)
-    console.log(feilterCat)
+    if (!feilterCat[0].image) {
+        Notiflix.Notify.failure("No data found😥, choose another breed")
+        refs.catInfo.innerHTML = '';
+        return;
+    }
     if (selectBreedId) {
         refs.catInfo.innerHTML = '';
         refs.loader.style.display = "block";
         fetchCatByBreed(selectBreedId)
+            .then(response => {
+                if (response.status !== 200) {
+                    throw new Error('Network response was not ok')
+                }
+                return response.data;
+            })
             .then(catData => {
-                console.log(catData)
                 const cat = `<img src="${catData[0].url}" width="600"><div><h1>${feilterCat[0].name}</h1><p style="width: 600px">${feilterCat[0].description}</p><p><b>Temperament:</b>${feilterCat[0].temperament}</p></div>`
                 refs.catInfo.insertAdjacentHTML("afterbegin", cat)
                 refs.loader.style.display = "none";
             })
             .catch(error => {
-                console.error(error);
                 Notiflix.Notify.failure("Oops! Something went wrong! Try reloading the page!")
                 refs.loader.style.display = "none";
         })
